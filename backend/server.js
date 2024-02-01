@@ -20,17 +20,12 @@ const logFilePath = "./logger.log";
 
 const tailStream = new tail.Tail(logFilePath);
 io.on("connection", (socket) => {
-  // Send last 10 lines to the new client
   const lastLines = getTailLines(logFilePath, 10);
   console.log(lastLines, "<<<<<<");
   socket.emit("initialData", lastLines);
-
-  // Listen for file updates and broadcast to clients
   tailStream.on("line", (data) => {
     socket.emit("update", data);
   });
-
-  // Handle disconnect
   socket.on("disconnect", () => {
     tailStream.unwatch();
   });
